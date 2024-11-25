@@ -3,12 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BSM Calculator</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Live Google Sheets Data</title>
+  <script>
+    const ws = new WebSocket('ws://localhost:3000');
+    
+    // Function to fetch and update the table
+    function updateTable(data) {
+      document.getElementById('data').innerHTML = data;
+    }
+
+    // Function to handle symbol selection change
+    function onSymbolChange() {
+      const symbol = document.getElementById('symbolSelect').value;
+      ws.send(symbol); // Send selected symbol to server
+    }
+
+    // On WebSocket message, update the table content
+    ws.onmessage = event => {
+      updateTable(event.data);
+    };
+  </script>
 </head>
 <body>
-  <h1>Welcome to BSM Calculator</h1>
-  <p>This is a live tool to calculate options pricing.</p>
-  <script src="script.js"></script>
+  <h1>OPTION CHAIN</h1>
+
+  <!-- Dropdown for selecting symbol -->
+  <label for="symbolSelect">Choose a Symbol:</label>
+  <select id="symbolSelect" onchange="onSymbolChange()">
+    <option value="Nifty">Nifty</option>
+    <option value="BankNifty">Bank Nifty</option>
+    <option value="CrudeOil">Crude Oil</option>
+    <option value="Sensex">Sensex</option>
+    <option value="Finnifty">Finnifty</option>
+  </select>
+
+  <div id="data">${await fetchSpreadsheetData('Nifty')}</div> <!-- Default symbol data -->
 </body>
 </html>
